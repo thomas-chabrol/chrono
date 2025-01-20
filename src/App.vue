@@ -54,15 +54,15 @@
       Terminé
     </div>
 
-    <audio ref="notificationSound" preload="auto">
-      <source src="/notification.wav" type="audio/mpeg">
+    <audio ref="notificationSound" preload="auto" playsinline>
+      <source src="/notification.wav" type="audio/wav">
     </audio>
     
-    <audio ref="warningSound" preload="auto">
+    <audio ref="warningSound" preload="auto" playsinline>
       <source src="/7sec_left.mp3" type="audio/mpeg">
     </audio>
 
-    <audio ref="finalWarningSound" preload="auto">
+    <audio ref="finalWarningSound" preload="auto" playsinline>
       <source src="/3sec_left.mp3" type="audio/mpeg">
     </audio>
   </div>
@@ -99,11 +99,42 @@ const initTimer = () => {
   startTimer();
 };
 
+// Initialize sounds on first user interaction
+const initSounds = () => {
+  // Create and load audio contexts
+  if (notificationSound.value) {
+    notificationSound.value.load();
+    // iOS requires user interaction to play sound
+    notificationSound.value.play().then(() => {
+      notificationSound.value.pause();
+      notificationSound.value.currentTime = 0;
+    }).catch(() => {});
+  }
+  if (warningSound.value) {
+    warningSound.value.load();
+    warningSound.value.play().then(() => {
+      warningSound.value.pause();
+      warningSound.value.currentTime = 0;
+    }).catch(() => {});
+  }
+  if (finalWarningSound.value) {
+    finalWarningSound.value.load();
+    finalWarningSound.value.play().then(() => {
+      finalWarningSound.value.pause();
+      finalWarningSound.value.currentTime = 0;
+    }).catch(() => {});
+  }
+};
+
 const playNotificationSound = () => {
   if (notificationSound.value) {
     notificationSound.value.currentTime = 0;
-    notificationSound.value.play().catch(error => {
+    notificationSound.value.play().then(() => {
+      // Sound played successfully
+    }).catch(error => {
       console.log('Erreur lors de la lecture du son:', error);
+      // Try to initialize sounds again on error
+      initSounds();
     });
   }
 };
@@ -111,8 +142,12 @@ const playNotificationSound = () => {
 const playWarningSound = () => {
   if (warningSound.value) {
     warningSound.value.currentTime = 0;
-    warningSound.value.play().catch(error => {
+    warningSound.value.play().then(() => {
+      // Sound played successfully
+    }).catch(error => {
       console.log('Erreur lors de la lecture du son d\'avertissement:', error);
+      // Try to initialize sounds again on error
+      initSounds();
     });
   }
 };
@@ -126,10 +161,14 @@ const stopWarningSound = () => {
 
 const playFinalWarningSound = () => {
   if (finalWarningSound.value) {
-    finalWarningSound.value.playbackRate = 2.0; // Vitesse x2
+    finalWarningSound.value.playbackRate = 2.0;
     finalWarningSound.value.currentTime = 0;
-    finalWarningSound.value.play().catch(error => {
+    finalWarningSound.value.play().then(() => {
+      // Sound played successfully
+    }).catch(error => {
       console.log('Erreur lors de la lecture du son final:', error);
+      // Try to initialize sounds again on error
+      initSounds();
     });
   }
 };
@@ -199,6 +238,18 @@ const formatTime = (seconds) => {
   const secs = seconds % 60;
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
+
+// Initialize sounds on first user interaction
+const handleUserInteraction = () => {
+  initSounds();
+  // Remove listeners after first interaction
+  document.removeEventListener('touchstart', handleUserInteraction);
+  document.removeEventListener('click', handleUserInteraction);
+};
+
+// Add event listeners for user interaction
+document.addEventListener('touchstart', handleUserInteraction);
+document.addEventListener('click', handleUserInteraction);
 
 onBeforeUnmount(() => {
   if (timer.value) {
