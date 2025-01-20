@@ -7,7 +7,14 @@ export default defineConfig({
     vue(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      includeAssets: [
+        'favicon.ico',
+        'apple-touch-icon.png',
+        'masked-icon.svg',
+        'notification.wav',
+        '7sec_left.mp3',
+        '3sec_left.mp3'
+      ],
       manifest: {
         name: 'Chrono Timer',
         short_name: 'Chrono',
@@ -15,6 +22,9 @@ export default defineConfig({
         theme_color: '#4CAF50',
         background_color: '#ffffff',
         display: 'standalone',
+        orientation: 'any',
+        start_url: '/',
+        scope: '/',
         icons: [
           {
             src: 'pwa-192x192.png',
