@@ -63,6 +63,9 @@ export default defineConfig({
     port: 80,
     watch: {
       usePolling: true
-    }
+    },
+    allowedHosts: [
+      'chrono.thomas-chabrol.dev',
+    ]
   }
 })
