@@ -1,0 +1,8 @@
+services:
+  frontend:
+    networks:
+      - npm-network
+
+networks:
+  npm-network:
+    external: true
